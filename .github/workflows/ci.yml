@@ -1,0 +1,33 @@
+name: Sprite Postprocess CI
+on:
+  pull_request:
+  push:
+    branches: [main]
+permissions:
+  contents: read
+jobs:
+  unit:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ['3.10', '3.12']
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: ${{ matrix.python-version }}
+      - run: python3 -m pip install -r requirements-test.txt
+      - run: python3 -m unittest discover -s tests -p 'test_sprite*.py' -v
+  editor-browser:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+      - run: python3 -m pip install -r requirements-test.txt
+      - run: python3 -m playwright install --with-deps chromium
+      - run: python3 tests/sprite_editor_browser.py
+      - run: python3 tests/sprite_local_edits_browser.py
+      - run: python3 tests/sprite_patches_browser.py
+      - run: python3 tests/sprite_patch_workflow_browser.py

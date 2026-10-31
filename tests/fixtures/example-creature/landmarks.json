@@ -1,0 +1,341 @@
+{
+  "source_sha256": "a8f1805b1e52e036504c54b31d8bf57adbe57b078a64afb65b653a0d6bee4f8c",
+  "purpose": "Diagnostic thorax stabilization after automatic ROI matching caused vertical jumps. Not a final body trajectory or approved gait.",
+  "annotation_uncertainty_px": 8,
+  "landmark_definitions": {
+    "shoulder_mass_center": "Visible proximal shoulder muscle mass; not elbow or paw.",
+    "upper_thorax": "Upper ribcage immediately behind shoulder mass.",
+    "lower_thorax": "Lower chest below shoulder, excluding moving forelimb."
+  },
+  "method": "Manually estimated body points, translation only. All motion offsets zero to isolate changes of pose.",
+  "frames": [
+    {
+      "source_box": [
+        0,
+        13,
+        488,
+        444
+      ],
+      "points": {
+        "shoulder_mass_center": {
+          "xy": [
+            296,
+            260
+          ],
+          "weight": 1.0
+        },
+        "upper_thorax": {
+          "xy": [
+            278,
+            231
+          ],
+          "weight": 1.0
+        },
+        "lower_thorax": {
+          "xy": [
+            299,
+            298
+          ],
+          "weight": 1.0
+        }
+      },
+      "motion": [
+        0,
+        0
+      ],
+      "anchors": {
+        "thorax_center": [
+          291.0,
+          263.0
+        ]
+      }
+    },
+    {
+      "source_box": [
+        464,
+        9,
+        933,
+        413
+      ],
+      "points": {
+        "shoulder_mass_center": {
+          "xy": [
+            756,
+            265
+          ],
+          "weight": 1.0
+        },
+        "upper_thorax": {
+          "xy": [
+            736,
+            235
+          ],
+          "weight": 1.0
+        },
+        "lower_thorax": {
+          "xy": [
+            769,
+            308
+          ],
+          "weight": 1.0
+        }
+      },
+      "motion": [
+        0,
+        0
+      ],
+      "anchors": {
+        "thorax_center": [
+          753.6666666666666,
+          269.3333333333333
+        ]
+      }
+    },
+    {
+      "source_box": [
+        934,
+        23,
+        1339,
+        460
+      ],
+      "points": {
+        "shoulder_mass_center": {
+          "xy": [
+            1168,
+            280
+          ],
+          "weight": 1.0
+        },
+        "upper_thorax": {
+          "xy": [
+            1152,
+            249
+          ],
+          "weight": 1.0
+        },
+        "lower_thorax": {
+          "xy": [
+            1170,
+            314
+          ],
+          "weight": 1.0
+        }
+      },
+      "motion": [
+        0,
+        0
+      ],
+      "anchors": {
+        "thorax_center": [
+          1163.3333333333333,
+          281.0
+        ]
+      }
+    },
+    {
+      "source_box": [
+        1289,
+        33,
+        1774,
+        431
+      ],
+      "points": {
+        "shoulder_mass_center": {
+          "xy": [
+            1615,
+            239
+          ],
+          "weight": 1.0
+        },
+        "upper_thorax": {
+          "xy": [
+            1598,
+            210
+          ],
+          "weight": 1.0
+        },
+        "lower_thorax": {
+          "xy": [
+            1621,
+            279
+          ],
+          "weight": 1.0
+        }
+      },
+      "motion": [
+        0,
+        0
+      ],
+      "anchors": {
+        "thorax_center": [
+          1611.3333333333333,
+          242.66666666666666
+        ]
+      }
+    },
+    {
+      "source_box": [
+        0,
+        457,
+        450,
+        815
+      ],
+      "points": {
+        "shoulder_mass_center": {
+          "xy": [
+            303,
+            646
+          ],
+          "weight": 1.0
+        },
+        "upper_thorax": {
+          "xy": [
+            279,
+            618
+          ],
+          "weight": 1.0
+        },
+        "lower_thorax": {
+          "xy": [
+            311,
+            681
+          ],
+          "weight": 1.0
+        }
+      },
+      "motion": [
+        0,
+        0
+      ],
+      "anchors": {
+        "thorax_center": [
+          297.6666666666667,
+          648.3333333333334
+        ]
+      }
+    },
+    {
+      "source_box": [
+        450,
+        471,
+        868,
+        853
+      ],
+      "points": {
+        "shoulder_mass_center": {
+          "xy": [
+            715,
+            656
+          ],
+          "weight": 1.0
+        },
+        "upper_thorax": {
+          "xy": [
+            696,
+            627
+          ],
+          "weight": 1.0
+        },
+        "lower_thorax": {
+          "xy": [
+            730,
+            691
+          ],
+          "weight": 1.0
+        }
+      },
+      "motion": [
+        0,
+        0
+      ],
+      "anchors": {
+        "thorax_center": [
+          713.6666666666666,
+          658.0
+        ]
+      }
+    },
+    {
+      "source_box": [
+        854,
+        465,
+        1314,
+        870
+      ],
+      "points": {
+        "shoulder_mass_center": {
+          "xy": [
+            1149,
+            639
+          ],
+          "weight": 1.0
+        },
+        "upper_thorax": {
+          "xy": [
+            1133,
+            610
+          ],
+          "weight": 1.0
+        },
+        "lower_thorax": {
+          "xy": [
+            1159,
+            676
+          ],
+          "weight": 1.0
+        }
+      },
+      "motion": [
+        0,
+        0
+      ],
+      "anchors": {
+        "thorax_center": [
+          1147.0,
+          641.6666666666666
+        ]
+      }
+    },
+    {
+      "source_box": [
+        1319,
+        471,
+        1774,
+        863
+      ],
+      "points": {
+        "shoulder_mass_center": {
+          "xy": [
+            1616,
+            652
+          ],
+          "weight": 1.0
+        },
+        "upper_thorax": {
+          "xy": [
+            1595,
+            624
+          ],
+          "weight": 1.0
+        },
+        "lower_thorax": {
+          "xy": [
+            1634,
+            685
+          ],
+          "weight": 1.0
+        }
+      },
+      "motion": [
+        0,
+        0
+      ],
+      "anchors": {
+        "thorax_center": [
+          1615.0,
+          653.6666666666666
+        ]
+      }
+    }
+  ]
+}
