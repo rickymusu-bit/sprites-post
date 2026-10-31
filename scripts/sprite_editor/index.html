@@ -1,0 +1,653 @@
+<!doctype html>
+<html lang="it">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Editor sprite · Allineamento</title>
+  <link rel="stylesheet" href="/editor.css" />
+  <header>
+    <div class="brand">
+      <span class="brand-icon">⌖</span>
+      <div>
+        <strong>Editor sprite</strong
+        ><small id="source-name">Caricamento sorgente…</small>
+      </div>
+    </div>
+    <div class="header-actions">
+      <span class="local">● Solo locale</span
+      ><span id="save-state">Progetto aperto</span>
+      <button id="load-project">Apri progetto</button
+      ><input
+        id="project-file"
+        type="file"
+        accept=".json,application/json"
+        hidden
+      />
+      <button id="patch-open">Correzioni ImageGen</button>
+      <button id="save-project">Salva progetto</button
+      ><button class="primary" id="export" disabled>
+        Esporta PNG e GIF ↗
+      </button>
+    </div>
+  </header>
+  <main>
+    <aside>
+      <div class="side-tabs segmented" role="group" aria-label="Area di lavoro">
+        <button id="landmark-mode" class="active" aria-pressed="true">
+          Allinea
+        </button>
+        <button id="local-mode" aria-pressed="false">Correggi</button>
+      </div>
+      <div id="landmark-panel">
+        <div class="section-label">ALLINEAMENTO</div>
+        <label class="check"
+          ><input id="align-body" type="checkbox" checked />Applica allineamento
+          del corpo</label
+        >
+        <label>Frame di riferimento<select id="reference"></select></label>
+        <p class="hint">
+          Usa punti sul corpo stabile. Evita zampe, coda e altre estremità in
+          movimento.
+        </p>
+        <div class="section-heading">
+          <h2>Punti di riferimento</h2>
+          <span id="point-count">0</span>
+        </div>
+        <div id="point-list"></div>
+        <form id="add-point">
+          <input
+            id="point-name"
+            placeholder="Nome del nuovo punto"
+            maxlength="80"
+            aria-label="Nome del nuovo punto"
+          /><button title="Aggiungi punto" aria-label="Aggiungi punto">
+            +
+          </button>
+        </form>
+        <div class="point-editor">
+          <div class="section-label" id="selected-label">PUNTO SELEZIONATO</div>
+          <div class="coordinates">
+            <label
+              >X sorgente<input id="point-x" type="number" step="0.1" /></label
+            ><label
+              >Y sorgente<input id="point-y" type="number" step="0.1"
+            /></label>
+          </div>
+          <label
+            >Affidabilità<input
+              id="point-weight"
+              type="number"
+              min="0.01"
+              step="0.1"
+              value="1"
+          /></label>
+          <button id="remove-point" class="text-button">
+            Rimuovi da questo frame
+          </button>
+          <p class="hint" id="point-help">
+            Seleziona un punto e clicca sull’originale per posizionarlo.
+          </p>
+        </div>
+        <details>
+          <summary>Movimento e scala</summary>
+          <div class="coordinates">
+            <label
+              >Spostamento X<input
+                id="motion-x"
+                type="number"
+                step="1"
+                value="0" /></label
+            ><label
+              >Spostamento Y<input
+                id="motion-y"
+                type="number"
+                step="1"
+                value="0"
+            /></label>
+          </div>
+          <p class="hint">
+            Conserva qui lo spostamento intenzionale del corpo, in pixel di
+            output.
+          </p>
+          <label class="check"
+            ><input id="allow-scale" type="checkbox" />Correggi la scala
+            uniforme</label
+          >
+          <label class="check"
+            ><input id="nearest" type="checkbox" />Campionamento pixel
+            art</label
+          >
+        </details>
+      </div>
+      <div id="local-panel" hidden>
+        <div class="section-label">CORREZIONI LOCALI</div>
+        <p class="hint">
+          Lavora sui pixel originali. La ricetta conserva selezioni, pivot e
+          ogni ritocco.
+        </p>
+        <div
+          class="local-tools"
+          role="group"
+          aria-label="Strumenti di correzione"
+        >
+          <button id="tool-part" aria-pressed="true">Seleziona parte</button>
+          <button id="tool-paint" aria-pressed="false">Pennello</button>
+          <button id="tool-erase" aria-pressed="false">Gomma</button>
+          <button id="tool-clone" aria-pressed="false">Timbro clone</button>
+        </div>
+        <p class="hint" id="local-help">
+          Clicca lungo il contorno della parte sull’originale, poi chiudi la
+          maschera.
+        </p>
+        <div id="mask-actions" class="local-actions">
+          <button id="finish-mask" disabled>Chiudi maschera</button
+          ><button id="cancel-mask">Annulla</button>
+        </div>
+        <div class="section-heading">
+          <h2>Correzioni nel frame</h2>
+          <span id="edit-count">0</span>
+        </div>
+        <div id="edit-list"></div>
+        <div id="part-controls" hidden>
+          <label>Nome della parte<input id="part-name" maxlength="80" /></label>
+          <button id="tool-pivot">Imposta pivot sull’originale</button>
+          <p id="pivot-status" class="hint">
+            Il pivot deve essere scelto prima di ruotare la parte.
+          </p>
+          <div class="coordinates">
+            <label>Pivot X<input id="pivot-x" type="number" step="0.1" /></label
+            ><label
+              >Pivot Y<input id="pivot-y" type="number" step="0.1"
+            /></label>
+          </div>
+          <div class="coordinates">
+            <label>Sposta X<input id="part-x" type="number" step="1" /></label
+            ><label>Sposta Y<input id="part-y" type="number" step="1" /></label>
+          </div>
+          <div class="coordinates">
+            <label
+              >Rotazione °<input
+                id="part-angle"
+                type="number"
+                min="-360"
+                max="360"
+                step="0.5" /></label
+            ><label
+              >Scala uniforme<input
+                id="part-scale"
+                type="number"
+                min="0.1"
+                max="8"
+                step="0.01"
+            /></label>
+          </div>
+          <label class="check"
+            ><input id="part-cut" type="checkbox" checked />Rimuovi la posizione
+            originale</label
+          >
+        </div>
+        <div id="brush-controls" hidden>
+          <label
+            >Raggio, pixel<input
+              id="brush-radius"
+              type="number"
+              min="0.5"
+              max="256"
+              step="0.5"
+              value="4"
+          /></label>
+          <div id="paint-controls">
+            <label
+              >Colore<input
+                id="paint-color"
+                type="color"
+                value="#ad3428" /></label
+            ><button id="tool-pick">Campiona colore dall’originale</button>
+          </div>
+          <div id="clone-controls" hidden>
+            <button id="tool-clone-source">Imposta origine del clone</button>
+            <p class="hint" id="clone-origin">Origine non scelta</p>
+          </div>
+        </div>
+        <div class="local-actions">
+          <button id="edit-earlier" disabled>Prima ↑</button
+          ><button id="edit-later" disabled>Dopo ↓</button>
+        </div>
+        <button id="remove-edit" class="text-button" disabled>
+          Elimina correzione selezionata
+        </button>
+        <p class="hint">
+          I vuoti scoperti restano trasparenti: ricostruiscili con pennello o
+          clone. Nessun riempimento automatico.
+        </p>
+      </div>
+      <div class="aside-footer">
+        Originali conservati · nessun upload<br /><span id="output-path"></span>
+      </div>
+    </aside>
+    <section class="workspace">
+      <div class="workspace-title">
+        <div>
+          <div class="eyebrow">REVISIONE DELLA SEQUENZA</div>
+          <h1 id="workspace-heading">
+            Allinea i punti. Controlla il movimento.
+          </h1>
+        </div>
+        <span class="frame-badge" id="frame-label">FRAME 01 / 08</span>
+      </div>
+      <div class="toolbar">
+        <div class="segmented" role="group" aria-label="Modalità confronto">
+          <button id="side-mode" class="active" aria-pressed="true">
+            Affiancati</button
+          ><button id="overlay-mode" aria-pressed="false">Sovrapposti</button>
+        </div>
+        <label class="check"
+          ><input id="show-onion" type="checkbox" />Onion skin</label
+        >
+        <label class="opacity"
+          >Opacità<input
+            id="opacity"
+            type="range"
+            min="0"
+            max="0.8"
+            step="0.05"
+            value="0.3"
+          /><output id="opacity-value">30%</output></label
+        >
+        <div class="toolbar-spacer"></div>
+        <button id="undo" title="Annulla (Ctrl+Z)" disabled>↶ Annulla</button
+        ><button id="redo" title="Ripristina (Ctrl+Maiusc+Z)" disabled>
+          ↷
+        </button>
+        <label class="zoom-label"
+          >Zoom<input
+            id="zoom"
+            type="range"
+            min="25"
+            max="250"
+            value="85"
+          /><output id="zoom-value">85%</output></label
+        ><button id="fit">Adatta</button>
+      </div>
+      <div class="comparison">
+        <article class="view-card">
+          <div class="view-heading">
+            <span
+              ><i class="dot before"></i
+              ><span id="raw-title">Originale · modifica i punti</span></span
+            ><span class="view-note">trascina per correggere</span>
+          </div>
+          <div class="canvas-viewport" id="raw-viewport">
+            <canvas
+              id="raw-canvas"
+              aria-label="Frame originale con punti trascinabili"
+            ></canvas>
+          </div>
+          <div class="view-footer">
+            <span>Coordinate sull’immagine sorgente</span
+            ><span id="source-box"></span>
+          </div>
+        </article>
+        <article class="view-card">
+          <div class="view-heading">
+            <span
+              ><i class="dot after"></i
+              ><span id="aligned-title">Allineato · anteprima</span></span
+            ><span class="view-note" id="canvas-size"></span>
+          </div>
+          <div class="canvas-viewport" id="aligned-viewport">
+            <canvas
+              id="aligned-canvas"
+              aria-label="Risultato dell’allineamento e onion skin"
+            ></canvas>
+          </div>
+          <div class="view-footer">
+            <span id="onion-legend">Stesso canvas dell’esportazione</span
+            ><span id="residual"></span>
+          </div>
+        </article>
+      </div>
+      <div class="diagnostic">
+        <span id="fit-state" class="fit-state">In attesa dei punti</span
+        ><span id="fit-message"
+          >Aggiungi punti corrispondenti per iniziare.</span
+        ><span id="busy" hidden>Calcolo…</span>
+      </div>
+      <div class="timeline-header">
+        <div class="playback">
+          <button id="previous" aria-label="Frame precedente">‹</button
+          ><button id="play" aria-label="Riproduci animazione">▶</button
+          ><button id="next" aria-label="Frame successivo">›</button
+          ><select id="speed" aria-label="Velocità di riproduzione">
+            <option value="0.25">0,25×</option>
+            <option value="0.5">0,5×</option>
+            <option value="1" selected>1×</option>
+            <option value="2">2×</option></select
+          ><label class="duration-label"
+            >Durata posa<input
+              id="duration"
+              type="number"
+              min="10"
+              max="60000"
+              step="10"
+              value="100"
+            />ms</label
+          >
+        </div>
+        <span class="hint"
+          >← → per scorrere · spazio per riprodurre · ultimo ↔ primo</span
+        >
+      </div>
+      <div id="timeline" aria-label="Fotogrammi della sequenza"></div>
+      <div id="notice" role="status" aria-live="polite">
+        Trascina i punti sull’originale: il confronto si aggiorna
+        automaticamente.
+      </div>
+      <div id="error" role="alert" hidden></div>
+    </section>
+  </main>
+  <dialog id="patch-dialog" aria-labelledby="patch-title">
+    <div class="patch-header">
+      <div>
+        <div class="eyebrow">CORREZIONE CIRCOSCRITTA</div>
+        <h2 id="patch-title">ImageGen · prepara, importa, verifica</h2>
+      </div>
+      <button id="patch-close" aria-label="Chiudi correzioni ImageGen">
+        ×
+      </button>
+    </div>
+    <p class="hint">
+      La generazione avviene separatamente. Qui scegli i pixel modificabili,
+      prepari i riferimenti e reinserisci il risultato conservando il resto.
+    </p>
+    <nav class="patch-tabs segmented" aria-label="Fasi della correzione">
+      <button id="patch-tab-prepare">1 · Prepara</button
+      ><button id="patch-tab-import">2 · Importa</button
+      ><button id="patch-tab-review">3 · Revisiona</button>
+    </nav>
+    <div id="patch-error" role="alert" hidden></div>
+    <p id="patch-message" role="status"></p>
+    <section id="patch-prepare-panel">
+      <div class="patch-columns">
+        <div>
+          <h3>Intervento locale</h3>
+          <p id="patch-selection" class="hint"></p>
+          <label
+            >Tipo di errore<select id="patch-error-type">
+              <option value="anatomy_detail">Anatomia locale errata</option>
+              <option value="missing_detail">Dettaglio mancante</option>
+              <option value="hidden_surface">
+                Superficie nascosta da ricostruire
+              </option>
+              <option value="position">Posizione · postprocessing</option>
+              <option value="rigid_rotation">Parte rigida · pivot</option>
+              <option value="impossible_pose">
+                Posa impossibile · nuovo keyframe
+              </option>
+              <option value="perspective">
+                Prospettiva generale · nuovo frame
+              </option>
+            </select></label
+          >
+          <div id="patch-fields"></div>
+          <label
+            >Contesto attorno alla maschera · px<input
+              id="patch-padding"
+              type="number"
+              value="32"
+              min="0"
+              max="1024"
+          /></label>
+        </div>
+        <div>
+          <h3>Riferimenti e istruzione</h3>
+          <label class="check"
+            ><input id="patch-use-source" type="checkbox" checked />Usa anche la
+            sorgente come riferimento</label
+          >
+          <label
+            >PNG canonici approvati<input
+              id="patch-references"
+              type="file"
+              multiple
+              accept="image/png"
+          /></label>
+          <label
+            >Revisione dei riferimenti allegati<input
+              id="patch-reference-revision"
+              placeholder="SHA o versione approvata"
+          /></label>
+          <label class="check"
+            ><input id="patch-references-approved" type="checkbox" />Confermo
+            che i riferimenti selezionati sono approvati</label
+          >
+          <button id="patch-compose">Componi una bozza del prompt</button>
+          <label
+            >Prompt esplicito da inviare<textarea
+              id="patch-prompt"
+              rows="10"
+              placeholder="Una sola modifica; descrivi connessioni obbligatorie e parti da preservare."
+            ></textarea>
+          </label>
+          <button id="patch-prepare" class="primary">
+            Prepara il pacchetto
+          </button>
+        </div>
+      </div>
+    </section>
+    <section id="patch-import-panel" hidden>
+      <div class="patch-request-row">
+        <label>Richiesta conservata<select id="patch-request"></select></label
+        ><button id="patch-resume">Riprendi il progetto della richiesta</button
+        ><a id="patch-download" download>Scarica pacchetto ZIP ↗</a>
+      </div>
+      <details>
+        <summary>Prompt e file da fornire al generatore</summary>
+        <pre id="patch-saved-prompt"></pre>
+        <div id="patch-input-files"></div>
+      </details>
+      <div class="patch-import-toolbar">
+        <label
+          >PNG restituito dal generatore<input
+            id="patch-candidate"
+            type="file"
+            accept="image/png" /></label
+        ><label
+          >Ingrandimento viste<input
+            id="patch-view-zoom"
+            type="range"
+            min="1"
+            max="4"
+            value="2"
+            step="0.5" /></label
+        ><button id="patch-clear-points">Azzera i landmark</button>
+      </div>
+      <p id="patch-dimensions" class="hint">
+        Carica il risultato per confrontarlo con il contesto originale.
+      </p>
+      <p id="patch-point-help" class="hint">
+        Clicca un punto stabile nel contesto originale, poi lo stesso punto nel
+        candidato. Ripeti per gli altri punti.
+      </p>
+      <div class="patch-columns patch-image-columns">
+        <div>
+          <h3>Contesto originale · destinazione</h3>
+          <div class="patch-image-viewport">
+            <canvas
+              id="patch-target-canvas"
+              aria-label="Landmark nel contesto originale"
+            ></canvas>
+          </div>
+        </div>
+        <div>
+          <h3>Candidato · coordinate native</h3>
+          <div class="patch-image-viewport">
+            <canvas
+              id="patch-generated-canvas"
+              aria-label="Landmark nel candidato generato"
+            ></canvas>
+          </div>
+        </div>
+      </div>
+      <div id="patch-point-list"></div>
+      <div class="patch-mapping-grid">
+        <label
+          >Adattamento iniziale<select id="patch-mapping">
+            <option value="none">Nessuno · identità o landmark</option>
+            <option value="fit">Adatta con scala uniforme e centra</option>
+            <option value="uniform">Scala uniforme e posizione manuali</option>
+          </select></label
+        >
+        <label
+          >Scala input<input
+            id="patch-input-scale"
+            type="number"
+            value="1"
+            min="0.000244140625"
+            max="4096"
+            step="0.001"
+        /></label>
+        <label
+          >Offset X<input
+            id="patch-offset-x"
+            type="number"
+            value="0"
+            step="0.1" /></label
+        ><label
+          >Offset Y<input
+            id="patch-offset-y"
+            type="number"
+            value="0"
+            step="0.1"
+        /></label>
+        <label class="check"
+          ><input id="patch-allow-scale" type="checkbox" />Stima scala dai
+          landmark</label
+        ><label class="check"
+          ><input id="patch-allow-rotation" type="checkbox" />Stima rotazione
+          dai landmark</label
+        ><label class="check"
+          ><input id="patch-nearest" type="checkbox" />Pixel art ·
+          nearest</label
+        >
+        <label
+          >Tolleranza landmark · px<input
+            id="patch-tolerance"
+            type="number"
+            value="2"
+            min="0"
+            max="128"
+            step="0.1" /></label
+        ><label
+          >Sfumatura interna · px<input
+            id="patch-feather"
+            type="number"
+            value="0"
+            min="0"
+            max="32"
+            step="0.5"
+        /></label>
+      </div>
+      <button id="patch-preview">Verifica l’anteprima mascherata</button>
+      <p id="patch-transform" class="hint"></p>
+      <img
+        id="patch-composite"
+        class="patch-composite"
+        alt="Anteprima del ritaglio dopo reinserimento mascherato"
+        hidden
+      />
+      <div class="patch-columns">
+        <div>
+          <label
+            >Servizio usato<input id="patch-service" value="ImageGen" /></label
+          ><label
+            >Provenienza reale del risultato<input
+              id="patch-provenance"
+              placeholder="Nome file, ID generazione se disponibile" /></label
+          ><label class="check"
+            ><input id="patch-prompt-confirmed" type="checkbox" />Confermo di
+            aver inviato esattamente il prompt conservato</label
+          >
+        </div>
+        <div>
+          <h3>File effettivamente forniti</h3>
+          <div id="patch-supplied-files"></div>
+        </div>
+      </div>
+      <button id="patch-apply" class="primary">
+        Reinserisci solo dentro la maschera
+      </button>
+    </section>
+    <section id="patch-review-panel" hidden>
+      <label
+        >Tentativo da revisionare<select id="patch-attempt"></select
+      ></label>
+      <p id="patch-review-status" class="patch-status"></p>
+      <img
+        id="patch-crop-comparison"
+        alt="Dettaglio prima e dopo della correzione locale"
+        class="patch-crop-comparison"
+        hidden
+      />
+      <details id="patch-full-comparison">
+        <summary>Confronto del frame completo</summary>
+        <img
+          id="patch-before-after"
+          alt="Prima e dopo della correzione locale"
+          class="patch-before-after"
+          hidden
+        />
+      </details>
+      <details>
+        <summary>
+          GIF diagnostica del ciclo · non è una registrazione del gioco
+        </summary>
+        <img
+          id="patch-diagnostic"
+          alt="Animazione diagnostica dei PNG corretti"
+          class="patch-diagnostic"
+        />
+      </details>
+      <div class="patch-columns">
+        <div>
+          <h3>Controlli visivi</h3>
+          <div id="patch-review-checks"></div>
+        </div>
+        <div>
+          <label>Revisore<input id="patch-reviewer" /></label
+          ><label
+            >Note della verifica<textarea
+              id="patch-review-notes"
+              rows="3"
+            ></textarea></label
+          ><label
+            >Evidenze · una per riga<textarea
+              id="patch-review-evidence"
+              rows="3"
+              placeholder="Percorsi o riferimenti alle verifiche reali, inclusa la scala finale"
+            ></textarea>
+          </label>
+          <p class="hint">
+            L’approvazione riguarda questa correzione. Integrazione nel gioco e
+            merge richiedono verifiche e approvazioni separate.
+          </p>
+        </div>
+      </div>
+      <div class="patch-review-actions">
+        <button id="patch-approve" class="primary">
+          Approva la correzione verificata</button
+        ><button id="patch-reject">
+          Scarta e ripristina il frame precedente
+        </button>
+      </div>
+      <p class="hint">
+        Il ripristino rimuove dal frame la correzione e i ritocchi successivi.
+        Puoi annullarlo con Annulla; il tentativo e la decisione restano
+        conservati.
+      </p>
+    </section>
+  </dialog>
+
+  <script src="/editor.js"></script>
+  <script src="/edits.js"></script>
+  <script src="/patches.js"></script>
+</html>
