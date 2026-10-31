@@ -21,10 +21,10 @@ jobs:
           git clone --depth 1 --single-branch --branch migration/sprite-postprocess-standalone-20261031 https://github.com/rickymusu-bit/quiz.git /tmp/sprite-source
           test "$(git -C /tmp/sprite-source rev-parse HEAD)" = '1783ea86087503e2624fd0c244bf0066095115ff'
           rsync -a --exclude='.git' /tmp/sprite-source/ ./
-          rm -f .github/workflows/import.yml
+          rm -f .github/workflows/import.yml .github/workflows/ci.yml
           test -f scripts/sprite_postprocess.py
           test -f tests/fixtures/example-creature/source-sheet.png
-          test -f .github/workflows/ci.yml
+          test ! -f .github/workflows/ci.yml
           echo 'Snapshot copied and source commit verified.'
       - name: Validate Python core
         run: |
