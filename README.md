@@ -2,7 +2,7 @@
 
 A reusable **local-first** toolkit for extracting frames from spritesheets, aligning them using body landmarks, reviewing animation with onion skin and loops, and applying deterministic edits and externally generated masked image repairs. It is **not coupled to any game engine** and does not call image generation services itself.
 
-**Status:** standalone-source migration snapshot from [Hellscape](https://github.com/rickymusu-bit/quiz), 31 October 2026. The tools already exist and have been tested in their original project; the relocated repository's CI must be rerun after import. This branch does **not** create the destination GitHub repository.
+**Status:** independent GitHub repository [rickymusu-bit/sprites-post](https://github.com/rickymusu-bit/sprites-post), imported from a pinned Hellscape snapshot on 31 October 2026. Core and browser regression tests ran successfully during import. See the current [CI status](https://github.com/rickymusu-bit/sprites-post/actions) for independently maintained checks, and [MIGRATION.md](MIGRATION.md) for provenance.
 
 ## Requirements
 
